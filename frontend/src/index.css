@@ -13,7 +13,7 @@
 
 @layer components {
   .half-screen {
-    @apply flex flex-col h-screen border border-primary;
+    @apply flex flex-col h-full border-r border-l border-b border-primary;
   }
   .half-screen-header {
     @apply grid grid-cols-[1fr_3fr] h-10;

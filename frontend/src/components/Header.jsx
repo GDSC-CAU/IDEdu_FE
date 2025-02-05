@@ -7,7 +7,7 @@ export default function Header({ title }) {
         {title}
         <img src={deleteIcon} alt="delete" className="w-9 h-9"></img>
       </div>
-      <div className="flex bg-primary border border-primary"></div>
+      <div className="flex bg-primary"></div>
     </div>
   );
 }

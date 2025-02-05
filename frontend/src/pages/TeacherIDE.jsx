@@ -1,7 +1,7 @@
 import HalfScreen from "../components/HalfScreen";
 import { useNavigate } from "react-router-dom";
 
-const StudentIDE = () => {
+const TeacherIDE = () => {
   const navigate = useNavigate();
 
   return (
@@ -15,12 +15,11 @@ const StudentIDE = () => {
           <span>강의실로 돌아가기</span>
         </span>
       </div>
-      <div className="grid grid-cols-2 w-full h-full">
-        <HalfScreen title="Teacher"></HalfScreen>
-        <HalfScreen title="Student"></HalfScreen>
+      <div className="grid grid-cols-[3fr_1fr] w-full h-full">
+        <HalfScreen title="Teacher">{/* 코드 작성 영역 */}</HalfScreen>
       </div>
     </div>
   );
 };
 
-export default StudentIDE;
+export default TeacherIDE;
