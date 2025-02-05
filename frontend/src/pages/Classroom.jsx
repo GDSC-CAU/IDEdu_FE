@@ -1,8 +1,9 @@
 import Board from "../components/Board";
 import AddButton from "../components/AddButton";
+import { useUser } from "../provider/UserContext";
 
 const Classroom = () => {
-  const isTeacher = true;
+  const { isTeacher } = useUser();
 
   return (
     <div className="flex flex-col h-screen w-full p-20 gap-8">
