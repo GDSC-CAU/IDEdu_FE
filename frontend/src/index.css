@@ -1,5 +1,24 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+@layer base {
+  html {
+    font-family: "Pretendard", sans-serif;
+  }
+}
+
+@layer components {
+  .half-screen {
+    @apply flex flex-col h-screen border border-primary;
+  }
+  .half-screen-header {
+    @apply grid grid-cols-[1fr_3fr] h-10;
+  }
+  .half-screen-header-text {
+    @apply grid grid-cols-[4fr_1fr] items-center justify-items-center font-jetbrains text-letter;
+  }
+}
