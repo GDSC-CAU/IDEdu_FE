@@ -2,6 +2,8 @@ import Board from "../components/Board";
 import AddButton from "../components/AddButton";
 
 const Classroom = () => {
+  const isTeacher = true;
+
   return (
     <div className="flex flex-col h-screen w-full p-20 gap-8">
       <div className="flex flex-row w-full px-10 items-center justify-between">
@@ -9,7 +11,7 @@ const Classroom = () => {
           강의실 1
         </div>
         <button className="flex justify-center bg-primary text-2xl py-3 px-10 text-white rounded-lg border border-primary hover:bg-secondary hover:text-primary">
-          수업하기
+          {isTeacher ? "수업하기" : "수업듣기"}
         </button>
       </div>
       <div className="grid grid-cols-[2fr_1fr] gap-4 h-full">
@@ -18,13 +20,13 @@ const Classroom = () => {
           {/* 공지사항 */}
           <Board title="공지사항" className="flex flex-col justify-between">
             <div className="flex-1">{/* 공지사항 내용 */}</div>
-            <AddButton></AddButton>
+            {isTeacher && <AddButton></AddButton>}
           </Board>
 
           {/* 과제함 */}
           <Board title="과제함" className="flex flex-col justify-between">
             <div className="flex-1">{/* 과제함 내용 */}</div>
-            <AddButton></AddButton>
+            {isTeacher && <AddButton></AddButton>}
           </Board>
 
           {/* 빌드 히스토리 */}
