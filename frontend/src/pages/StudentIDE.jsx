@@ -1,5 +1,6 @@
 import HalfScreen from "../components/HalfScreen";
 import { useNavigate } from "react-router-dom";
+import Editor from "@monaco-editor/react";
 
 const StudentIDE = () => {
   const navigate = useNavigate();
@@ -17,7 +18,9 @@ const StudentIDE = () => {
       </div>
       <div className="grid grid-cols-2 w-full h-full">
         <HalfScreen title="Teacher"></HalfScreen>
-        <HalfScreen title="Student"></HalfScreen>
+        <HalfScreen title="Student">
+          <Editor />
+        </HalfScreen>
       </div>
     </div>
   );
