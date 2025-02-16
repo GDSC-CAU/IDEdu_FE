@@ -2,6 +2,7 @@ import Board from "../components/Board";
 import AddButton from "../components/AddButton";
 import { useUser } from "../provider/UserContext";
 import { useNavigate } from "react-router-dom";
+import StudentList from "../components/StudentList";
 
 const Classroom = () => {
   const { isTeacher } = useUser();
@@ -51,7 +52,7 @@ const Classroom = () => {
 
         {/* 오른쪽: 학생 명단 */}
         <Board title="학생 명단">
-          <div className="flex-1">{/* 학생 명단 내용 */}</div>
+          <StudentList />
         </Board>
       </div>
     </div>
