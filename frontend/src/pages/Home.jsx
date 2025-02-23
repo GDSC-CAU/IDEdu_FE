@@ -1,50 +1,42 @@
+import { useState } from "react";
 import logo from "../assets/logo.png";
 import HalfScreen from "../components/HalfScreen";
-import { useNavigate } from "react-router-dom";
 import { useUser } from "../provider/UserContext";
+import LoginSection from "../components/homepage/LoginSection";
+import Login from "../components/homepage/Login";
+import SignUp from "../components/homepage/SignUp";
 
-function LoginSection() {
-  const navigate = useNavigate();
+const Home = () => {
   const { setIsTeacher } = useUser();
+  const [view, setView] = useState("loginSection");
 
   const handleUserSelect = (isTeacher) => {
     setIsTeacher(isTeacher);
-    navigate("/classroom");
+    setView("login");
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center flex-1 gap-4">
-      <h1 className="text-3xl text-letter font-jetbrains p-4">I'm a ...</h1>
-      <div className="flex flex-row gap-4 justify-center items-center">
-        <span className="text-primary text-6xl font-jetbrains">{`{`}</span>
-        <button
-          className="text-letter text-4xl font-jetbrains hover:bg-primary hover:text-white"
-          onClick={() => handleUserSelect(true)}
-        >
-          teacher
-        </button>
-        <span className="text-letter text-5xl font-jetbrains">{`||`}</span>
-        <button
-          className=" text-letter text-4xl font-jetbrains hover:bg-primary hover:text-white"
-          onClick={() => handleUserSelect(false)}
-        >
-          student
-        </button>
-        <span className="text-primary text-6xl font-jetbrains">{`}`}</span>
-      </div>
-    </div>
-  );
-}
+  const viewMap = {
+    loginSection: <LoginSection handleUserSelect={handleUserSelect} />,
+    login: (
+      <Login
+        onBack={() => setView("loginSection")}
+        onSignUp={() => setView("signUp")}
+      />
+    ),
+    signUp: (
+      <SignUp
+        onBack={() => setView("login")}
+        onSignUp={() => setView("loginSection")}
+      />
+    ),
+  };
 
-const Home = () => {
   return (
     <div className="grid grid-cols-2 w-full h-screen">
       <HalfScreen title="IDEdu.7dren">
         <img src={logo} alt="logo" className="w-1/2" />
       </HalfScreen>
-      <HalfScreen title="login.7dren">
-        <LoginSection />
-      </HalfScreen>
+      <HalfScreen title="login.7dren">{viewMap[view]}</HalfScreen>
     </div>
   );
 };
