@@ -19,6 +19,15 @@ const TeacherIDE = () => {
         <HalfScreen title="Teacher">
           <CodeEditor />
         </HalfScreen>
+        <div className="flex flex-col items-center p-5 gap-5">
+          <button className="bg-secondary p-2 w-4/5 hover:bg-primary hover:text-white">
+            수업 시작하기
+          </button>
+          <div className="flex flex-row justify-between items-center w-full">
+            <h1 className="text-lg">학생명단</h1>
+            <span className="mr-4">도움</span>
+          </div>
+        </div>
       </div>
     </div>
   );
