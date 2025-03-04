@@ -1,5 +1,7 @@
 import { useUser } from "../provider/UserContext";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import deleteIcon from "../assets/delete.png";
 
 function ClassroomCard({ name, content }) {
   const navigate = useNavigate();
@@ -46,8 +48,70 @@ function ClassroomList({ isTeacher }) {
   );
 }
 
+function AddClassroomModal({ isOpen, onClose }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg w-96 relative">
+        <h2 className="text-xl font-bold mb-4 text-center">강의실 추가</h2>
+        <input
+          type="text"
+          className="w-full p-2 border border-gray-300 rounded-md mb-4"
+          placeholder="강의실 이름을 입력하세요"
+        />
+        <button className="w-full dark-btn p-2" onClick={onClose}>
+          개설하기
+        </button>
+        <button
+          className="p-1 rounded absolute top-2 right-2"
+          onClick={onClose}
+        >
+          <img src={deleteIcon} alt="delete" className="w-6 h-6" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function EnterClassroomModal({ isOpen, onClose }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg w-96 relative">
+        <h2 className="text-xl font-bold mb-4 text-center">강의실 입장</h2>
+        <input
+          type="text"
+          className="w-full p-2 border border-gray-300 rounded-md mb-4"
+          placeholder="강의실 코드를 입력하세요"
+        />
+        <button className="w-full dark-btn p-2" onClick={onClose}>
+          입장하기
+        </button>
+        <button
+          className="p-1 rounded absolute top-2 right-2"
+          onClick={onClose}
+        >
+          <img src={deleteIcon} alt="delete" className="w-6 h-6" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const Dashboard = () => {
   const { isTeacher } = useUser();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEnterModalOpen, setIsEnterModalOpen] = useState(false);
+
+  const handleModalButtonClick = () => {
+    if (isTeacher) {
+      setIsAddModalOpen(true);
+    } else {
+      setIsEnterModalOpen(true);
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen w-full p-20 gap-8">
@@ -56,13 +120,23 @@ const Dashboard = () => {
           칠드런 님의 강의
         </div>
         <button
-          className="flex justify-center bg-primary text-2xl py-3 px-10 text-white rounded-lg border border-primary hover:bg-secondary hover:text-primary"
-          // onClick={}
+          className="dark-btn text-2xl py-3 px-10"
+          onClick={() => handleModalButtonClick()}
         >
           {isTeacher ? "강의실 추가" : "강의실 입장"}
         </button>
       </div>
       <ClassroomList isTeacher={isTeacher} />
+
+      {/* 모달 컴포넌트 */}
+      <AddClassroomModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
+      <EnterClassroomModal
+        isOpen={isEnterModalOpen}
+        onClose={() => setIsEnterModalOpen(false)}
+      />
     </div>
   );
 };

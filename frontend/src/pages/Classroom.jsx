@@ -23,7 +23,7 @@ const Classroom = () => {
           강의실 1
         </div>
         <button
-          className="flex justify-center bg-primary text-2xl py-3 px-10 text-white rounded-lg border border-primary hover:bg-secondary hover:text-primary"
+          className="dark-btn bg-primary text-2xl py-3 px-10"
           onClick={handleClassStart}
         >
           {isTeacher ? "수업하기" : "수업듣기"}
