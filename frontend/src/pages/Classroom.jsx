@@ -19,7 +19,7 @@ const Classroom = () => {
   return (
     <div className="flex flex-col h-screen w-full p-20 gap-8">
       <div className="flex flex-row w-full px-10 items-center justify-between">
-        <div className="flex justify-center text-3xl font-bold text-primary">
+        <div className="flex justify-center text-4xl font-bold text-primary">
           강의실 1
         </div>
         <button

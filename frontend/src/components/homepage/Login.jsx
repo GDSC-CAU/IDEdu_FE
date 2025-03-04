@@ -10,7 +10,7 @@ export default function Login({ onBack, onSignUp }) {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    navigate("/classroom");
+    navigate("/dashboard");
   };
 
   return (
