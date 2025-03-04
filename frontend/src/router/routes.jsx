@@ -3,6 +3,7 @@ import Home from "../pages/Home";
 import Classroom from "../pages/Classroom";
 import StudentIDE from "../pages/StudentIDE";
 import TeacherIDE from "../pages/TeacherIDE";
+import Dashboard from "../pages/Dashboard";
 
 const ideduRouter = createBrowserRouter([
   {
@@ -12,6 +13,10 @@ const ideduRouter = createBrowserRouter([
   {
     path: "/classroom",
     element: <Classroom />,
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
   },
   {
     path: "/student-ide",

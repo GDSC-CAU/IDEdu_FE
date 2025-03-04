@@ -27,4 +27,7 @@
   .input-field {
     @apply text-center text-2xl w-2/3 p-3 font-jetbrains bg-gray-200 outline-none text-letter;
   }
+  .dark-btn {
+    @apply bg-primary text-white rounded-lg border border-primary hover:bg-secondary hover:text-primary;
+  }
 }
