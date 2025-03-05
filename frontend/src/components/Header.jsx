@@ -5,7 +5,7 @@ export default function Header({ title }) {
     <div className="half-screen-header">
       <div className="half-screen-header-text">
         {title}
-        <img src={deleteIcon} alt="delete" className="w-9 h-9"></img>
+        <img src={deleteIcon} alt="delete" className="w-6 h-6"></img>
       </div>
       <div className="flex bg-primary"></div>
     </div>

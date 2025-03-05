@@ -9,7 +9,7 @@ export default function StudentList() {
   return (
     <div className="flex flex-col gap-1">
       {students.map((name, index) => (
-        <div key={index} className="text-lg p-1">
+        <div key={index} className="text-base p-1">
           {name}
         </div>
       ))}

@@ -13,7 +13,7 @@ function ClassroomCard({ name, content }) {
       className="flex flex-row w-full px-32 py-4 items-center justify-between font-normal text-lg border-b hover:bg-gray-50"
       onClick={handleClassroomClick}
     >
-      <span className="font-bold">{name}</span>
+      <span className="font-semibold">{name}</span>
       <span>{content}</span>
     </button>
   );
@@ -33,7 +33,7 @@ function ClassroomList({ isTeacher }) {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row w-full px-32 py-2 items-center justify-between font-light rounded-lg bg-secondary text-letter">
+      <div className="flex flex-row w-full px-32 py-2 items-center justify-between font-light rounded-lg bg-secondary text-letter text-sm">
         <span>강의실 이름</span>
         <span>{headerContent}</span>
       </div>
@@ -54,7 +54,7 @@ function AddClassroomModal({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg w-96 relative">
-        <h2 className="text-xl font-bold mb-4 text-center">강의실 추가</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">강의실 추가</h2>
         <input
           type="text"
           className="w-full p-2 border border-gray-300 rounded-md mb-4"
@@ -80,7 +80,7 @@ function EnterClassroomModal({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg w-96 relative">
-        <h2 className="text-xl font-bold mb-4 text-center">강의실 입장</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">강의실 입장</h2>
         <input
           type="text"
           className="w-full p-2 border border-gray-300 rounded-md mb-4"
@@ -116,11 +116,11 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col h-screen w-full p-20 gap-8">
       <div className="flex flex-row w-full px-10 items-center justify-between">
-        <div className="flex justify-center text-4xl font-bold text-primary">
+        <div className="flex justify-center text-3xl font-bold text-primary">
           칠드런 님의 강의
         </div>
         <button
-          className="dark-btn text-2xl py-3 px-10"
+          className="dark-btn text-xl py-3 px-10"
           onClick={() => handleModalButtonClick()}
         >
           {isTeacher ? "강의실 추가" : "강의실 입장"}

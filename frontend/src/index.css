@@ -16,16 +16,16 @@
     @apply flex flex-col h-full border-r border-l border-b border-primary;
   }
   .half-screen-header {
-    @apply grid grid-cols-[1fr_3fr] h-10;
+    @apply grid grid-cols-[1fr_3fr] h-7 text-sm;
   }
   .half-screen-header-text {
     @apply grid grid-cols-[4fr_1fr] items-center justify-items-center font-jetbrains text-letter;
   }
   .main-btn {
-    @apply text-letter text-4xl font-jetbrains px-2 py-1 hover:bg-primary hover:text-white;
+    @apply text-letter text-3xl font-jetbrains px-2 py-1 hover:bg-primary hover:text-white;
   }
   .input-field {
-    @apply text-center text-2xl w-2/3 p-3 font-jetbrains bg-gray-200 outline-none text-letter;
+    @apply text-center text-xl w-2/3 p-3 font-jetbrains bg-gray-200 outline-none text-letter;
   }
   .dark-btn {
     @apply bg-primary text-white rounded-lg border border-primary hover:bg-secondary hover:text-primary;

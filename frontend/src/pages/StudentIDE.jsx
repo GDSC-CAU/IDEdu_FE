@@ -9,7 +9,7 @@ const StudentIDE = () => {
     <div className="flex flex-col h-screen w-screen">
       <div className="flex flex-col h-10 items-start justify-center bg-primary text-white border-b border-white">
         <span
-          className="flex items-center gap-4 py-2 px-5 cursor-pointer"
+          className="flex items-center gap-4 py-2 px-5 pr-16 cursor-pointer"
           onClick={() => navigate(`/classroom`)}
         >
           <span>{"<"}</span>
@@ -17,7 +17,9 @@ const StudentIDE = () => {
         </span>
       </div>
       <div className="grid grid-cols-2 w-full h-full">
-        <HalfScreen title="Teacher"></HalfScreen>
+        <HalfScreen title="Teacher">
+          수업이 아직 시작되지 않았습니다.
+        </HalfScreen>
         <HalfScreen title="Student">
           <CodeEditor />
         </HalfScreen>
