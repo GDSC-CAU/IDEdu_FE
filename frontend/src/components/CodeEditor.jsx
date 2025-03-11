@@ -5,36 +5,78 @@ import { Client } from "@stomp/stompjs";
 
 const DOCUMENT_ID = 1;
 const USER_ID = parseInt(Math.floor(Math.random() * 1000000)); // int형
-// const USER_ID = 1234;
 
 export default function CodeEditor() {
   const editorRef = useRef(null);
   const stompClient = useRef(null);
   const isMounted = useRef(true); // 컴포넌트 마운트 상태 유지
-  const isConnectedRef = useRef(false); // 웹소켓 연결 상태를 useRef로 관리
+  const isConnectedRef = useRef(false); // 웹소켓 연결 상태
   const [code, setCode] = useState("");
   const [isConnected, setIsConnected] = useState(false);
-  const [latestVersion, setLatestVersion] = useState(0);
+  const latestVersion = useRef(0);
+  const isIgnoring = useRef(false);
 
   // 서버에서 받은 이벤트 처리
   const handleServerEvent = useCallback((data) => {
+    if (data.userId === USER_ID) {
+      console.log("자신의 메시지 무시");
+      latestVersion.current = data.version;
+      return;
+    }
     console.log("서버에서 받은 메시지:", data);
-
     if (!editorRef.current) return;
+
+    const model = editorRef.current.getModel();
+    if (!model) return;
+
+    // 1차원 position을 2차원(line, column)으로 변환
+    const pos = model.getPositionAt(data.position);
+
+    isIgnoring.current = true; // 무시 시작
 
     switch (data.operation) {
       // case "SYNC":
-      //   console.log("SYNC_RESPONSE 받음:", data.content);
+      //   console.log("SYNC 받음:", data.content);
       //   setCode(data.content);
       //   setLatestVersion(data.version);
       //   break;
 
       case "INSERT":
         console.log("삽입 이벤트 받음:", data);
+        model.pushEditOperations(
+          [],
+          [
+            {
+              range: {
+                startLineNumber: pos.lineNumber,
+                startColumn: pos.column,
+                endLineNumber: pos.lineNumber,
+                endColumn: pos.column,
+              },
+              text: data.insertContent,
+            },
+          ],
+          () => null
+        );
         break;
       case "DELETE":
-        console.log("편집 이벤트 받음:", data);
-        // processIncomingEdit(data);
+        console.log("삭제 이벤트 받음:", data);
+        const endPos = model.getPositionAt(data.position + data.deleteLength);
+        model.pushEditOperations(
+          [],
+          [
+            {
+              range: {
+                startLineNumber: pos.lineNumber,
+                startColumn: pos.column,
+                endLineNumber: endPos.lineNumber,
+                endColumn: endPos.column,
+              },
+              text: "",
+            },
+          ],
+          () => null
+        );
         break;
 
       case "CURSOR":
@@ -42,12 +84,17 @@ export default function CodeEditor() {
         break;
 
       // case "USER_DISCONNECTED":
-      //   console.log(`User ${data.userId} disconnected`);
+      //   console.log(`유저 ${data.userId} 연결 종료`);
       //   break;
 
       default:
-        console.warn("알 수 없는 이벤트 타입:", data.type);
+        console.warn("알 수 없는 이벤트 타입:", data.operation);
     }
+
+    latestVersion.current = data.version;
+    setTimeout(() => {
+      isIgnoring.current = false; // 무시 종료
+    }, 50);
   }, []);
 
   useEffect(() => {
@@ -61,18 +108,13 @@ export default function CodeEditor() {
     const sock = new SockJS("http://15.165.155.115:8080/ws"); // SockJS 연결
     stompClient.current = new Client({
       webSocketFactory: () => {
-        console.log("연결 중인 웹소켓 주소 : ", sock.url);
         return sock;
       },
 
       reconnectDelay: 10000, // 10초 후 자동 재연결
       debug: (str) => console.log("STOMP Debug:", str),
       onConnect: (frame) => {
-        console.log("STOMP Debug: 연결ㄹㄹㄹㄹㄹ", frame.headers);
-        console.log("STOMP Debug: connected to server", stompClient.brokerURL);
-
         if (!isMounted.current) return;
-        console.log("웹소켓 연결상태 :", stompClient.current.connected);
         console.log("웹소켓 연결 성공");
         setIsConnected(true);
         isConnectedRef.current = true; // 웹소켓 활성화 됨을 기록
@@ -85,12 +127,10 @@ export default function CodeEditor() {
         );
         console.log("웹소켓 연결상태 :", stompClient.current.connected);
         try {
-          console.log("아아아?");
           stompClient.current.subscribe(
             `/sub/edit/${DOCUMENT_ID}`,
             (message) => {
               console.log("메시지 수신:", message.body || "메시지 없음");
-              // console.log("dkdkdk");
               try {
                 const data = JSON.parse(message.body);
                 handleServerEvent(data);
@@ -101,8 +141,6 @@ export default function CodeEditor() {
             }
           );
           console.log("구독 성공");
-          console.log("웹소켓 연결상태 :", stompClient.current.connected);
-          sendTestEditMessage();
         } catch (error) {
           console.error("구독 실패 에러 :", error);
         }
@@ -129,13 +167,10 @@ export default function CodeEditor() {
       console.error("웹소켓 연결 시도 중 에러:", error);
     }
 
-    // sendTestEditMessage();
-
     return () => {
       isMounted.current = false;
       if (stompClient.current && stompClient.current.active) {
         try {
-          // sendDisconnect();
           stompClient.current.deactivate();
           console.log("웹소켓 연결 해제 완료");
         } catch (error) {
@@ -154,63 +189,53 @@ export default function CodeEditor() {
       console.log("에디터 마운트 시작");
       editorRef.current = editor;
 
-      // 연결 상태 확인 후 이벤트 핸들러 등록
-      if (isConnected && stompClient.current) {
-        console.log("WebSocket 연결됨 - 이벤트 핸들러 등록");
+      editor.onDidChangeModelContent((event) => {
+        if (isIgnoring.current || !stompClient.current?.connected) return;
+        event.changes.forEach((change) => {
+          // 삭제가 있는 경우 DELETE 메시지 전송
+          if (change.rangeLength > 0) {
+            const deleteMessage = {
+              operation: "DELETE",
+              documentId: DOCUMENT_ID,
+              insertContent: "",
+              deleteLength: change.rangeLength,
+              position: change.rangeOffset,
+              baseVersion: latestVersion.current,
+              userId: USER_ID,
+            };
 
-        editor.onDidChangeModelContent((event) => {
-          if (!isConnected || !stompClient.current) return;
-
-          console.log("내용 변경 감지:", event.changes);
-          const changes = event.changes[0];
-          if (!changes) return;
-
-          const message = {
-            operation: changes.text.length > 0 ? "INSERT" : "DELETE",
-            documentId: DOCUMENT_ID,
-            insertContent: changes.text,
-            deleteLength: changes.rangeLength || 0,
-            position: changes.rangeOffset,
-            baseVersion: latestVersion,
-            userId: USER_ID,
-          };
-
-          console.log("전송할 메시지:", message); // 메시지 확인
-          console.log("연결 상태:", isConnected); // 연결 상태 확인
-          console.log("stompClient:", stompClient.current); // stompClient 확인
-
-          try {
             stompClient.current.publish({
               destination: "/pub/edit",
-              body: JSON.stringify(message),
+              body: JSON.stringify(deleteMessage),
             });
-            console.log("메시지 전송 완료");
-          } catch (error) {
-            console.error("메시지 전송 실패:", error);
+
+            console.log("DELETE 메시지 전송 완료", deleteMessage);
+          }
+
+          // 삽입이 있는 경우 INSERT 메시지 전송
+          if (change.text.length > 0) {
+            const insertMessage = {
+              operation: "INSERT",
+              documentId: DOCUMENT_ID,
+              insertContent: change.text,
+              deleteLength: 0,
+              position: change.rangeOffset,
+              baseVersion: latestVersion.current,
+              userId: USER_ID,
+            };
+
+            stompClient.current.publish({
+              destination: "/pub/edit",
+              body: JSON.stringify(insertMessage),
+            });
+
+            console.log("INSERT 메시지 전송 완료", insertMessage);
           }
         });
-      }
+      });
     },
-    [isConnected, stompClient, latestVersion]
+    [latestVersion]
   );
-  const sendTestEditMessage = () => {
-    const message = {
-      operation: "INSERT",
-      documentId: DOCUMENT_ID,
-      insertContent: "Hello, World!", // 삽입할 텍스트
-      deleteLength: 0,
-      position: 0, // 삽입할 위치
-      baseVersion: 0,
-      userId: USER_ID,
-    };
-
-    console.log("편집 메시지 전송:", message);
-
-    stompClient.current.publish({
-      destination: "/pub/edit",
-      body: JSON.stringify(message),
-    });
-  };
 
   return (
     <div className="relative w-full h-full">
@@ -223,7 +248,6 @@ export default function CodeEditor() {
         height="100%"
         defaultLanguage="javascript"
         value={code}
-        // theme="vs-dark"
         onMount={handleEditorDidMount}
         options={{
           minimap: { enabled: false },
