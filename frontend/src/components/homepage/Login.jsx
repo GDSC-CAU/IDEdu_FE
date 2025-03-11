@@ -9,8 +9,51 @@ export default function Login({ onBack, onSignUp }) {
   const { isTeacher } = useUser();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    navigate("/dashboard");
+  const handleLogin = async () => {
+    console.log("입력된 값:", id, password);
+    if (!id || !password) {
+      alert("모든 필드를 입력해주세요.");
+      return;
+    }
+    let alertMessage = "";
+    if (id.length < 5) {
+      alertMessage += "아이디는 5자 이상이어야 합니다.\n";
+    }
+    if (password.length < 8) {
+      alertMessage += "비밀번호는 8자 이상이어야 합니다.\n";
+    }
+    if (alertMessage) {
+      alert(alertMessage);
+      return;
+    }
+    try {
+      const requestData = {
+        userId: id,
+        password: password,
+      };
+      console.log("요청 데이터:", requestData);
+
+      const response = await fetch("http://15.165.155.115:8080/api/sign-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+      console.log("응답 상태:", response.status);
+
+      if (!response.ok) {
+        alert("로그인 실패: 데이터 패치 실패");
+        return;
+      }
+      const data = await response.json();
+      console.log("로그인 성공: ", data);
+      localStorage.setItem("token", data.result.token);
+      navigate(`/dashboard/${data.result.userId}`);
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      alert("로그인 실패");
+    }
   };
 
   return (

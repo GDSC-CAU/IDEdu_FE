@@ -15,7 +15,7 @@ const ideduRouter = createBrowserRouter([
     element: <Classroom />,
   },
   {
-    path: "/dashboard",
+    path: "/dashboard/:userId",
     element: <Dashboard />,
   },
   {

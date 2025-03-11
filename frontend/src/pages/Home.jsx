@@ -19,14 +19,14 @@ const Home = () => {
     loginSection: <LoginSection handleUserSelect={handleUserSelect} />,
     login: (
       <Login
-        onBack={() => setView("loginSection")}
-        onSignUp={() => setView("signUp")}
+        onBack={() => setView("loginSection")} // 뒤로가면 메인 화면으로
+        onSignUp={() => setView("signUp")} // 회원가입 버튼 클릭 시 회원가입 화면으로
       />
     ),
     signUp: (
       <SignUp
-        onBack={() => setView("login")}
-        onSignUp={() => setView("loginSection")}
+        onBack={() => setView("login")} // 뒤로가면 로그인 화면
+        onSignUp={() => setView("loginSection")} // 회원가입 성공 시 메인 화면으로
       />
     ),
   };
