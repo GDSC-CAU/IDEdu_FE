@@ -1,6 +1,5 @@
-import { useUser } from "../provider/UserContext";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import deleteIcon from "../assets/delete.png";
 
 function ClassroomCard({ name, content }) {
@@ -19,17 +18,8 @@ function ClassroomCard({ name, content }) {
   );
 }
 
-function ClassroomList({ isTeacher }) {
+function ClassroomList({ isTeacher, courseList }) {
   const headerContent = isTeacher ? "강의실 코드" : "선생님";
-  const classrooms = isTeacher
-    ? [
-        { name: "강의실 1", content: "IX035J2" },
-        { name: "강의실 2", content: "PK123S1" },
-      ]
-    : [
-        { name: "강의실 1", content: "칠드런" },
-        { name: "강의실 2", content: "송정현" },
-      ];
 
   return (
     <div className="flex flex-col">
@@ -37,19 +27,60 @@ function ClassroomList({ isTeacher }) {
         <span>강의실 이름</span>
         <span>{headerContent}</span>
       </div>
-      {classrooms.map((classroom, index) => (
-        <ClassroomCard
-          key={index}
-          name={classroom.name}
-          content={classroom.content}
-        />
-      ))}
+      {courseList.length === 0 ? (
+        <div className="flex justify-center items-center py-8 text-lg text-gray-600">
+          강의가 없습니다.
+        </div>
+      ) : (
+        courseList.map((classroom, index) => (
+          <ClassroomCard
+            key={index}
+            name={classroom.courseName}
+            content={isTeacher ? classroom.courseCode : classroom.teacherName}
+          />
+        ))
+      )}
     </div>
   );
 }
 
-function AddClassroomModal({ isOpen, onClose }) {
+function AddClassroomModal({ isOpen, onClose, onSuccess }) {
+  const [classroomName, setClassroomName] = useState("");
+  const token = localStorage.getItem("token");
   if (!isOpen) return null;
+
+  const handleSubmit = async () => {
+    if (!classroomName.trim()) {
+      alert("강의실 이름을 입력해주세요.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `http://15.165.155.115:8080/api/classroom/add?name=${encodeURIComponent(
+          classroomName
+        )}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("강의실 생성 실패");
+      }
+      const data = await response.json();
+      console.log("강의실 생성 성공:", data);
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error("강의실 생성 오류:", error);
+      alert("강의실 추가에 실패했습니다.");
+    } finally {
+      setClassroomName("");
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -59,9 +90,11 @@ function AddClassroomModal({ isOpen, onClose }) {
           type="text"
           className="w-full p-2 border border-gray-300 rounded-md mb-4"
           placeholder="강의실 이름을 입력하세요"
+          value={classroomName}
+          onChange={(e) => setClassroomName(e.target.value)}
         />
-        <button className="w-full dark-btn p-2" onClick={onClose}>
-          개설하기
+        <button className="w-full dark-btn p-2" onClick={handleSubmit}>
+          "개설하기"
         </button>
         <button
           className="p-1 rounded absolute top-2 right-2"
@@ -74,8 +107,43 @@ function AddClassroomModal({ isOpen, onClose }) {
   );
 }
 
-function EnterClassroomModal({ isOpen, onClose }) {
+function EnterClassroomModal({ isOpen, onClose, onSuccess }) {
+  const [classroomCode, setClassroomCode] = useState("");
+  const token = localStorage.getItem("token");
   if (!isOpen) return null;
+
+  const handleSubmit = async () => {
+    if (!classroomCode.trim()) {
+      alert("강의실 코드를 입력해주세요.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `http://15.165.155.115:8080/api/classroom/enter?code=${encodeURIComponent(
+          classroomCode
+        )}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("강의실 입장 실패");
+      }
+      const data = await response.json();
+      console.log("강의실 입장 성공:", data);
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error("강의실 생성 오류:", error);
+      alert("강의실 추가에 실패했습니다.");
+    } finally {
+      setClassroomCode("");
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -85,8 +153,10 @@ function EnterClassroomModal({ isOpen, onClose }) {
           type="text"
           className="w-full p-2 border border-gray-300 rounded-md mb-4"
           placeholder="강의실 코드를 입력하세요"
+          value={classroomCode}
+          onChange={(e) => setClassroomCode(e.target.value)}
         />
-        <button className="w-full dark-btn p-2" onClick={onClose}>
+        <button className="w-full dark-btn p-2" onClick={handleSubmit}>
           입장하기
         </button>
         <button
@@ -101,9 +171,12 @@ function EnterClassroomModal({ isOpen, onClose }) {
 }
 
 const Dashboard = () => {
-  const { isTeacher } = useUser();
+  const [isTeacher, setIsTeacher] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEnterModalOpen, setIsEnterModalOpen] = useState(false);
+  const token = localStorage.getItem("token");
+  const [username, setUsername] = useState("");
+  const [courseList, setCourseList] = useState([]);
 
   const handleModalButtonClick = () => {
     if (isTeacher) {
@@ -112,12 +185,44 @@ const Dashboard = () => {
       setIsEnterModalOpen(true);
     }
   };
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch("http://15.165.155.115:8080/api/myprofile", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("프로필 가져오기 실패");
+      }
+      const data = await response.json();
+      console.log("프로필 데이터:", data);
+      const userInfo = data.result;
+      if (userInfo.teacherName) {
+        setIsTeacher(true);
+        setUsername(userInfo.teacherName);
+        setCourseList(userInfo.teacherCourseInfoList || []);
+      } else {
+        setIsTeacher(false);
+        setUsername(userInfo.studentName);
+        setCourseList(userInfo.studentCourseInfoList || []);
+      }
+    } catch (error) {
+      console.error("프로필 가져오기 오류:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (token) fetchProfile();
+  }, [token]);
 
   return (
     <div className="flex flex-col h-screen w-full p-20 gap-8">
       <div className="flex flex-row w-full px-10 items-center justify-between">
         <div className="flex justify-center text-3xl font-bold text-primary">
-          칠드런 님의 강의
+          {username} 님의 강의
         </div>
         <button
           className="dark-btn text-xl py-3 px-10"
@@ -126,16 +231,18 @@ const Dashboard = () => {
           {isTeacher ? "강의실 추가" : "강의실 입장"}
         </button>
       </div>
-      <ClassroomList isTeacher={isTeacher} />
+      <ClassroomList isTeacher={isTeacher} courseList={courseList} />
 
       {/* 모달 컴포넌트 */}
       <AddClassroomModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        onSuccess={fetchProfile}
       />
       <EnterClassroomModal
         isOpen={isEnterModalOpen}
         onClose={() => setIsEnterModalOpen(false)}
+        onSuccess={fetchProfile}
       />
     </div>
   );
