@@ -252,7 +252,7 @@ const Dashboard = () => {
     <div className="flex flex-col h-screen w-full p-20 gap-8">
       <div className="flex flex-row w-full pl-10 items-center justify-between">
         <div className="flex justify-center text-3xl font-bold text-primary">
-          {username} 님의 강의
+          {username} 님
         </div>
         <div className="flex flex-row items-center gap-4">
           <button
