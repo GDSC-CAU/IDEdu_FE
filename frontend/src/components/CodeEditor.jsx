@@ -192,6 +192,7 @@ export default function CodeEditor() {
       editor.onDidChangeModelContent((event) => {
         if (isIgnoring.current || !stompClient.current?.connected) return;
         event.changes.forEach((change) => {
+          console.log("버전관리:", latestVersion.current);
           // 삭제가 있는 경우 DELETE 메시지 전송
           if (change.rangeLength > 0) {
             const deleteMessage = {

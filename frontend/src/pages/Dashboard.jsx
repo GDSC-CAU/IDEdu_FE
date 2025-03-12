@@ -1,19 +1,43 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import deleteIcon from "../assets/delete.png";
+// import goback from "../assets/goback.png";
+import logout from "../assets/logout.png";
 
-function ClassroomCard({ name, content }) {
+function ClassroomCard({ name, content, isTeacher }) {
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
+
   const handleClassroomClick = () => {
     navigate(`/classroom`);
   };
+
+  const handleCopyClick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <button
       className="flex flex-row w-full px-32 py-4 items-center justify-between font-normal text-lg border-b hover:bg-gray-50"
       onClick={handleClassroomClick}
     >
       <span className="font-semibold">{name}</span>
-      <span>{content}</span>
+      <span className="flex items-center gap-2">
+        {copied && (
+          <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded border border-gray-300">
+            복사됨!
+          </span>
+        )}
+        <span
+          className={isTeacher ? "cursor-grab hover:text-blue-500" : ""}
+          onClick={isTeacher ? handleCopyClick : undefined}
+        >
+          {content}
+        </span>
+      </span>
     </button>
   );
 }
@@ -37,6 +61,7 @@ function ClassroomList({ isTeacher, courseList }) {
             key={index}
             name={classroom.courseName}
             content={isTeacher ? classroom.courseCode : classroom.teacherName}
+            isTeacher={isTeacher}
           />
         ))
       )}
@@ -88,13 +113,13 @@ function AddClassroomModal({ isOpen, onClose, onSuccess }) {
         <h2 className="text-xl font-semibold mb-4 text-center">강의실 추가</h2>
         <input
           type="text"
-          className="w-full p-2 border border-gray-300 rounded-md mb-4"
+          className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-1 focus:ring-primary"
           placeholder="강의실 이름을 입력하세요"
           value={classroomName}
           onChange={(e) => setClassroomName(e.target.value)}
         />
         <button className="w-full dark-btn p-2" onClick={handleSubmit}>
-          "개설하기"
+          개설하기
         </button>
         <button
           className="p-1 rounded absolute top-2 right-2"
@@ -151,7 +176,7 @@ function EnterClassroomModal({ isOpen, onClose, onSuccess }) {
         <h2 className="text-xl font-semibold mb-4 text-center">강의실 입장</h2>
         <input
           type="text"
-          className="w-full p-2 border border-gray-300 rounded-md mb-4"
+          className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-1 focus:ring-primary"
           placeholder="강의실 코드를 입력하세요"
           value={classroomCode}
           onChange={(e) => setClassroomCode(e.target.value)}
@@ -177,6 +202,7 @@ const Dashboard = () => {
   const token = localStorage.getItem("token");
   const [username, setUsername] = useState("");
   const [courseList, setCourseList] = useState([]);
+  const navigate = useNavigate();
 
   const handleModalButtonClick = () => {
     if (isTeacher) {
@@ -184,6 +210,10 @@ const Dashboard = () => {
     } else {
       setIsEnterModalOpen(true);
     }
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
   const fetchProfile = async () => {
     try {
@@ -220,16 +250,21 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col h-screen w-full p-20 gap-8">
-      <div className="flex flex-row w-full px-10 items-center justify-between">
+      <div className="flex flex-row w-full pl-10 items-center justify-between">
         <div className="flex justify-center text-3xl font-bold text-primary">
-          {username} 님의 강의
+          {username} 님
         </div>
-        <button
-          className="dark-btn text-xl py-3 px-10"
-          onClick={() => handleModalButtonClick()}
-        >
-          {isTeacher ? "강의실 추가" : "강의실 입장"}
-        </button>
+        <div className="flex flex-row items-center gap-4">
+          <button
+            className="dark-btn text-xl py-3 px-10"
+            onClick={() => handleModalButtonClick()}
+          >
+            {isTeacher ? "강의실 추가" : "강의실 입장"}
+          </button>
+          <button className="w-7 h-9" onClick={handleLogout}>
+            <img src={logout} alt="logout" className="w-6" />
+          </button>
+        </div>
       </div>
       <ClassroomList isTeacher={isTeacher} courseList={courseList} />
 
