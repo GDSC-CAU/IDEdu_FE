@@ -1,6 +1,7 @@
 import HalfScreen from "../components/HalfScreen";
 import { useNavigate } from "react-router-dom";
 import CodeEditor from "../components/CodeEditor";
+import goback from "../assets/goback-w.png";
 
 const StudentIDE = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const StudentIDE = () => {
           className="flex items-center gap-4 py-2 px-5 pr-16 cursor-pointer"
           onClick={() => navigate(`/classroom`)}
         >
-          <span>{"<"}</span>
+          <img src={goback} alt="goback" className="w-4" />
           <span>강의실로 돌아가기</span>
         </span>
       </div>

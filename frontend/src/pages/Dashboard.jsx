@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import deleteIcon from "../assets/delete.png";
+// import goback from "../assets/goback.png";
+import logout from "../assets/logout.png";
 
 function ClassroomCard({ name, content, isTeacher }) {
   const navigate = useNavigate();
@@ -200,6 +202,7 @@ const Dashboard = () => {
   const token = localStorage.getItem("token");
   const [username, setUsername] = useState("");
   const [courseList, setCourseList] = useState([]);
+  const navigate = useNavigate();
 
   const handleModalButtonClick = () => {
     if (isTeacher) {
@@ -207,6 +210,10 @@ const Dashboard = () => {
     } else {
       setIsEnterModalOpen(true);
     }
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
   const fetchProfile = async () => {
     try {
@@ -243,16 +250,21 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col h-screen w-full p-20 gap-8">
-      <div className="flex flex-row w-full px-10 items-center justify-between">
+      <div className="flex flex-row w-full pl-10 items-center justify-between">
         <div className="flex justify-center text-3xl font-bold text-primary">
           {username} 님의 강의
         </div>
-        <button
-          className="dark-btn text-xl py-3 px-10"
-          onClick={() => handleModalButtonClick()}
-        >
-          {isTeacher ? "강의실 추가" : "강의실 입장"}
-        </button>
+        <div className="flex flex-row items-center gap-4">
+          <button
+            className="dark-btn text-xl py-3 px-10"
+            onClick={() => handleModalButtonClick()}
+          >
+            {isTeacher ? "강의실 추가" : "강의실 입장"}
+          </button>
+          <button className="w-7 h-9" onClick={handleLogout}>
+            <img src={logout} alt="logout" className="w-6" />
+          </button>
+        </div>
       </div>
       <ClassroomList isTeacher={isTeacher} courseList={courseList} />
 
