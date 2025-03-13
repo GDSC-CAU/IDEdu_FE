@@ -3,6 +3,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import CodeMirror from "@uiw/react-codemirror";
+import Terminal from "./Terminal";
 
 export default function CodeEditor({ ideId, userId }) {
   const stompClient = useRef(null);
@@ -56,19 +57,19 @@ export default function CodeEditor({ ideId, userId }) {
         } catch (error) {
           console.error("구독 실패 에러 :", error);
         }
-        // // ✅ 최초 렌더링 시 `SYNC` 요청 한 번만 전송
-        // if (!isSyncRequested.current) {
-        //   const syncMessage = {
-        //     operation: "SYNC",
-        //     documentId: documentId.current,
-        //   };
-        //   stompClient.current.publish({
-        //     destination: "/pub/edit",
-        //     body: JSON.stringify(syncMessage),
-        //   });
-        //   console.log("🔄 SYNC 요청 전송:", syncMessage);
-        //   isSyncRequested.current = true; // SYNC 요청을 다시 보내지 않도록 설정
-        // }
+        // ✅ 최초 렌더링 시 `SYNC` 요청 한 번만 전송
+        if (!isSyncRequested.current) {
+          const syncMessage = {
+            operation: "SYNC",
+            documentId: documentId.current,
+          };
+          stompClient.current.publish({
+            destination: "/pub/edit",
+            body: JSON.stringify(syncMessage),
+          });
+          console.log("🔄 SYNC 요청 전송:", syncMessage);
+          isSyncRequested.current = true; // SYNC 요청을 다시 보내지 않도록 설정
+        }
 
         console.log("WebSocket 연결 성공!");
       },
@@ -175,8 +176,6 @@ export default function CodeEditor({ ideId, userId }) {
         console.log("서버로 INSERT 전송:", insertMessage);
       }
     });
-
-    // ❌ `setCode(value)` 호출 X → 직접 로컬 변경 금지!
   };
 
   return (
@@ -192,6 +191,15 @@ export default function CodeEditor({ ideId, userId }) {
         extensions={[javascript()]}
         onChange={handleChange}
       />
+      <div className="absolute bottom-0 left-0 right-0">
+        {isConnected && stompClient.current && (
+          <Terminal
+            stompClient={stompClient}
+            ideId={documentId.current}
+            code={code}
+          />
+        )}
+      </div>
     </div>
   );
 }
