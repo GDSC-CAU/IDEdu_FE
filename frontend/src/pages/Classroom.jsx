@@ -1,21 +1,33 @@
 import Board from "../components/Board";
 import AddButton from "../components/AddButton";
-import { useUser } from "../provider/UserContext";
-import { useNavigate } from "react-router-dom";
-import StudentList from "../components/StudentList";
+import { useNavigate, useParams } from "react-router-dom";
+import StudentList from "../components/classroom/StudentList";
+import NoticeList from "../components/classroom/NoticeList";
 import goback from "../assets/goback.png";
 import logout from "../assets/logout.png";
+import { useClassroom } from "../hooks/useClassroomData";
 
 const Classroom = () => {
-  const { isTeacher } = useUser();
   const navigate = useNavigate();
-  const USER_ID = "katies";
+  const { courseId } = useParams();
+  const {
+    className,
+    teacherIdeId,
+    studentIdeId,
+    notices,
+    assignments,
+    buildHistories,
+    students,
+    loading,
+    error,
+    isTeacher,
+  } = useClassroom(courseId);
 
   const handleClassStart = () => {
     if (isTeacher) {
-      navigate("/teacher-ide");
+      navigate(`/classroom/${courseId}/teacher-ide`);
     } else {
-      navigate("/student-ide");
+      navigate(`/classroom/${courseId}/student-ide`);
     }
   };
 
@@ -28,14 +40,11 @@ const Classroom = () => {
     <div className="flex flex-col h-screen w-full p-20 gap-8">
       <div className="flex flex-row w-full items-center justify-between">
         <div className="flex flex-row items-center gap-4">
-          <button
-            onClick={() => navigate(`/dashboard/${USER_ID}`)}
-            className="w-7 h-9"
-          >
+          <button onClick={() => navigate("/dashboard")} className="w-7 h-9">
             <img src={goback} alt="goback" className="w-6" />
           </button>
           <div className="flex justify-center text-3xl font-bold text-primary">
-            강의실 1
+            {className}
           </div>
         </div>
         <div className="flex flex-row items-center gap-4">
@@ -55,7 +64,9 @@ const Classroom = () => {
         <div className="grid grid-cols-2 grid-rows-[2fr_1fr] gap-4 h-full">
           {/* 공지사항 */}
           <Board title="공지사항" className="flex flex-col justify-between">
-            <div className="flex-1">{/* 공지사항 내용 */}</div>
+            <div className="flex-1">
+              <NoticeList notices={notices} />
+            </div>
             {isTeacher && <AddButton></AddButton>}
           </Board>
 
@@ -73,7 +84,7 @@ const Classroom = () => {
 
         {/* 오른쪽: 학생 명단 */}
         <Board title="학생 명단">
-          <StudentList />
+          <StudentList students={students} />
         </Board>
       </div>
     </div>

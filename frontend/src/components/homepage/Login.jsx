@@ -49,7 +49,7 @@ export default function Login({ onBack, onSignUp }) {
       const data = await response.json();
       console.log("로그인 성공: ", data);
       localStorage.setItem("token", data.result.token);
-      navigate(`/dashboard/${data.result.userId}`);
+      navigate("/dashboard");
     } catch (error) {
       console.error("로그인 오류:", error);
       alert("로그인 실패");
