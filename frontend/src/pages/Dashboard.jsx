@@ -4,12 +4,12 @@ import deleteIcon from "../assets/delete.png";
 // import goback from "../assets/goback.png";
 import logout from "../assets/logout.png";
 
-function ClassroomCard({ name, content, isTeacher }) {
+function ClassroomCard({ name, content, isTeacher, courseId }) {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
 
   const handleClassroomClick = () => {
-    navigate(`/classroom`);
+    navigate(`/classroom/${courseId}`);
   };
 
   const handleCopyClick = (e) => {
@@ -61,6 +61,7 @@ function ClassroomList({ isTeacher, courseList }) {
             key={index}
             name={classroom.courseName}
             content={isTeacher ? classroom.courseCode : classroom.teacherName}
+            courseId={classroom.courseId}
             isTeacher={isTeacher}
           />
         ))
