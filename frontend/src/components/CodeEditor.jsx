@@ -3,10 +3,10 @@ import Editor from "@monaco-editor/react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
-const DOCUMENT_ID = 1;
-const USER_ID = parseInt(Math.floor(Math.random() * 1000000)); // int형
+// const DOCUMENT_ID = 1;
+// const USER_ID = parseInt(Math.floor(Math.random() * 1000000)); // int형
 
-export default function CodeEditor() {
+export default function CodeEditor({ ideId, userId }) {
   const editorRef = useRef(null);
   const stompClient = useRef(null);
   const isMounted = useRef(true); // 컴포넌트 마운트 상태 유지
@@ -15,10 +15,11 @@ export default function CodeEditor() {
   const [isConnected, setIsConnected] = useState(false);
   const latestVersion = useRef(0);
   const isIgnoring = useRef(false);
+  const documentId = useRef(ideId);
 
   // 서버에서 받은 이벤트 처리
   const handleServerEvent = useCallback((data) => {
-    if (data.userId === USER_ID) {
+    if (data.userId === userId) {
       console.log("자신의 메시지 무시");
       latestVersion.current = data.version;
       return;
@@ -83,10 +84,6 @@ export default function CodeEditor() {
         console.log("커서 업데이트:", data);
         break;
 
-      // case "USER_DISCONNECTED":
-      //   console.log(`유저 ${data.userId} 연결 종료`);
-      //   break;
-
       default:
         console.warn("알 수 없는 이벤트 타입:", data.operation);
     }
@@ -103,7 +100,9 @@ export default function CodeEditor() {
       return;
     }
 
+    documentId.current = ideId;
     isMounted.current = true;
+
     console.log("컴포넌트 마운트 완료, 웹소켓 연결 시작");
     const sock = new SockJS("http://15.165.155.115:8080/ws"); // SockJS 연결
     stompClient.current = new Client({
@@ -123,12 +122,12 @@ export default function CodeEditor() {
 
         console.log(
           "현재 클라 존재, 구독 설정 시작 : ",
-          `/sub/edit/${DOCUMENT_ID}`
+          `/sub/edit/${documentId.current}`
         );
         console.log("웹소켓 연결상태 :", stompClient.current.connected);
         try {
           stompClient.current.subscribe(
-            `/sub/edit/${DOCUMENT_ID}`,
+            `/sub/edit/${documentId.current}`,
             (message) => {
               console.log("메시지 수신:", message.body || "메시지 없음");
               try {
@@ -189,20 +188,19 @@ export default function CodeEditor() {
       console.log("에디터 마운트 시작");
       editorRef.current = editor;
 
-      editor.onDidChangeModelContent((event) => {
+      const handleContentChange = (event) => {
         if (isIgnoring.current || !stompClient.current?.connected) return;
+        console.log("제발제발 documentId : ", documentId.current);
         event.changes.forEach((change) => {
-          console.log("버전관리:", latestVersion.current);
-          // 삭제가 있는 경우 DELETE 메시지 전송
           if (change.rangeLength > 0) {
             const deleteMessage = {
               operation: "DELETE",
-              documentId: DOCUMENT_ID,
+              documentId: documentId.current,
               insertContent: "",
               deleteLength: change.rangeLength,
               position: change.rangeOffset,
               baseVersion: latestVersion.current,
-              userId: USER_ID,
+              userId: userId,
             };
 
             stompClient.current.publish({
@@ -217,12 +215,12 @@ export default function CodeEditor() {
           if (change.text.length > 0) {
             const insertMessage = {
               operation: "INSERT",
-              documentId: DOCUMENT_ID,
+              documentId: documentId.current,
               insertContent: change.text,
               deleteLength: 0,
               position: change.rangeOffset,
               baseVersion: latestVersion.current,
-              userId: USER_ID,
+              userId: userId,
             };
 
             stompClient.current.publish({
@@ -233,7 +231,9 @@ export default function CodeEditor() {
             console.log("INSERT 메시지 전송 완료", insertMessage);
           }
         });
-      });
+      };
+
+      editor.onDidChangeModelContent(handleContentChange);
     },
     [latestVersion]
   );

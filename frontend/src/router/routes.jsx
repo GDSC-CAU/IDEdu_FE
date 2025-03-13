@@ -11,19 +11,19 @@ const ideduRouter = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/classroom",
+    path: "/classroom/:courseId",
     element: <Classroom />,
   },
   {
-    path: "/dashboard/:userId",
+    path: "/dashboard",
     element: <Dashboard />,
   },
   {
-    path: "/student-ide",
+    path: "/classroom/:courseId/student-ide",
     element: <StudentIDE />,
   },
   {
-    path: "/teacher-ide",
+    path: "/classroom/:courseId/teacher-ide",
     element: <TeacherIDE />,
   },
 ]);
