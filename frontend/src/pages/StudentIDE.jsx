@@ -2,6 +2,7 @@ import HalfScreen from "../components/HalfScreen";
 import { useNavigate, useParams } from "react-router-dom";
 import CodeEditor from "../components/CodeEditor";
 import goback from "../assets/goback-w.png";
+import CodeMirror from "../components/CodeMirror";
 import { useClassroom } from "../hooks/useClassroomData";
 import { useState } from "react";
 
@@ -24,14 +25,24 @@ const StudentIDE = () => {
       </div>
       <div className="grid grid-cols-2 w-full h-full">
         <HalfScreen title="Teacher">
-          <CodeEditor
+          {/* <CodeEditor
+            key={`${userId}-${teacherIdeId}`}
+            ideId={teacherIdeId}
+            userId={userId}
+          /> */}
+          <CodeMirror
             key={`${userId}-${teacherIdeId}`}
             ideId={teacherIdeId}
             userId={userId}
           />
         </HalfScreen>
         <HalfScreen title="Student">
-          <CodeEditor
+          {/* <CodeEditor
+            key={`${userId}-${studentIdeId}`}
+            ideId={studentIdeId}
+            userId={userId}
+          /> */}
+          <CodeMirror
             key={`${userId}-${studentIdeId}`}
             ideId={studentIdeId}
             userId={userId}
