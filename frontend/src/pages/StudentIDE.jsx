@@ -2,7 +2,7 @@ import HalfScreen from "../components/HalfScreen";
 import { useNavigate, useParams } from "react-router-dom";
 import CodeEditor from "../components/CodeEditor";
 import goback from "../assets/goback-w.png";
-import CodeMirror from "../components/CodeMirror";
+import CodeMirror from "../components/ide/CodeMirror";
 import { useClassroom } from "../hooks/useClassroomData";
 import { useState } from "react";
 
