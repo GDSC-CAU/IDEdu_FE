@@ -9,7 +9,7 @@ export default function Terminal({ stompClient, ideId, code }) {
 
   useEffect(() => {
     if (!stompClient.current || !stompClient.current.connected) {
-      console.warn("🚨 WebSocket이 아직 연결되지 않음, 구독 대기 중...");
+      console.warn("WebSocket이 아직 연결되지 않음, 구독 대기 중...");
       return;
     }
     const client = stompClient.current;

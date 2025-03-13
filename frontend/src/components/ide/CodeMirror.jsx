@@ -176,8 +176,6 @@ export default function CodeEditor({ ideId, userId }) {
         console.log("서버로 INSERT 전송:", insertMessage);
       }
     });
-
-    // ❌ `setCode(value)` 호출 X → 직접 로컬 변경 금지!
   };
 
   return (
