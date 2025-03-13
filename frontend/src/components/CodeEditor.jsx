@@ -3,9 +3,6 @@ import Editor from "@monaco-editor/react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
-// const DOCUMENT_ID = 1;
-// const USER_ID = parseInt(Math.floor(Math.random() * 1000000)); // int형
-
 export default function CodeEditor({ ideId, userId }) {
   const editorRef = useRef(null);
   const stompClient = useRef(null);
@@ -106,13 +103,11 @@ export default function CodeEditor({ ideId, userId }) {
     console.log("컴포넌트 마운트 완료, 웹소켓 연결 시작");
     const sock = new SockJS("http://15.165.155.115:8080/ws"); // SockJS 연결
     stompClient.current = new Client({
-      webSocketFactory: () => {
-        return sock;
-      },
-
+      webSocketFactory: () => sock,
       reconnectDelay: 10000, // 10초 후 자동 재연결
       debug: (str) => console.log("STOMP Debug:", str),
-      onConnect: (frame) => {
+
+      onConnect: () => {
         if (!isMounted.current) return;
         console.log("웹소켓 연결 성공");
         setIsConnected(true);
