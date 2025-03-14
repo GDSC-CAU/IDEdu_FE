@@ -1,4 +1,3 @@
-import AddButton from "./AddButton";
 import add from "../assets/add.png";
 
 export default function Board({ title, children, isTeacher }) {

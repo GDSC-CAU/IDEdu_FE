@@ -1,5 +1,4 @@
 import Board from "../components/Board";
-import AddButton from "../components/AddButton";
 import { useNavigate, useParams } from "react-router-dom";
 import StudentList from "../components/classroom/StudentList";
 import NoticeList from "../components/classroom/NoticeList";
@@ -71,12 +70,10 @@ const Classroom = () => {
             <div className="grid grid-cols-2 gap-4 flex-[3] min-h-0">
               <Board title="공지사항" isTeacher={isTeacher}>
                 <NoticeList notices={notices} />
-                {/* {isTeacher && <AddButton />} */}
               </Board>
 
               <Board title="과제함" isTeacher={isTeacher}>
                 <AssignmentList assignments={assignments} />
-                {/* {isTeacher && <AddButton />} */}
               </Board>
             </div>
 
