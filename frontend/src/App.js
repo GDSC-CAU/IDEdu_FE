@@ -4,7 +4,7 @@ import { UserProvider } from "./provider/UserContext";
 
 function App() {
   return (
-    <main className="min-h-screen max-h-screen h-full w-full bg-white flex items-center justify-center">
+    <main className="h-screen w-full bg-white flex items-center justify-center">
       <UserProvider>
         <IDEduRouter />
       </UserProvider>

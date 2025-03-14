@@ -1,11 +1,12 @@
 import Board from "../components/Board";
-import AddButton from "../components/AddButton";
 import { useNavigate, useParams } from "react-router-dom";
 import StudentList from "../components/classroom/StudentList";
 import NoticeList from "../components/classroom/NoticeList";
 import goback from "../assets/goback.png";
 import logout from "../assets/logout.png";
 import { useClassroom } from "../hooks/useClassroomData";
+import AssignmentList from "../components/classroom/AssignmentList";
+import BuildHistory from "../components/classroom/BuildHistory";
 
 const Classroom = () => {
   const navigate = useNavigate();
@@ -37,8 +38,9 @@ const Classroom = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full p-20 gap-8">
-      <div className="flex flex-row w-full items-center justify-between">
+    <div className="flex flex-col h-screen w-full">
+      {/* 상단 헤더 */}
+      <div className="flex flex-row w-full items-center justify-between p-8">
         <div className="flex flex-row items-center gap-4">
           <button onClick={() => navigate("/dashboard")} className="w-7 h-9">
             <img src={goback} alt="goback" className="w-6" />
@@ -59,33 +61,33 @@ const Classroom = () => {
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-[2fr_1fr] gap-4 h-full">
-        {/* 왼쪽: 공지사항, 과제함, 빌드 히스토리 */}
-        <div className="grid grid-cols-2 grid-rows-[2fr_1fr] gap-4 h-full">
-          {/* 공지사항 */}
-          <Board title="공지사항" className="flex flex-col justify-between">
-            <div className="flex-1">
-              <NoticeList notices={notices} />
+
+      {/* 메인 컨텐츠 */}
+      <div className="flex-1 px-8 pb-8 min-h-0">
+        <div className="grid grid-cols-[3fr_1fr] gap-4 h-full">
+          {/* 왼쪽: 공지사항, 과제함, 빌드 히스토리 */}
+          <div className="flex flex-col gap-4 h-full min-h-0">
+            <div className="grid grid-cols-2 gap-4 flex-[3] min-h-0">
+              <Board title="공지사항" isTeacher={isTeacher}>
+                <NoticeList notices={notices} />
+              </Board>
+
+              <Board title="과제함" isTeacher={isTeacher}>
+                <AssignmentList assignments={assignments} />
+              </Board>
             </div>
-            {isTeacher && <AddButton></AddButton>}
-          </Board>
 
-          {/* 과제함 */}
-          <Board title="과제함" className="flex flex-col justify-between">
-            <div className="flex-1">{/* 과제함 내용 */}</div>
-            {isTeacher && <AddButton></AddButton>}
-          </Board>
+            <div className="flex-[2] min-h-0">
+              <Board title="빌드 히스토리">
+                <BuildHistory buildHistories={buildHistories} />
+              </Board>
+            </div>
+          </div>
 
-          {/* 빌드 히스토리 */}
-          <Board title="빌드 히스토리" className="col-span-2">
-            <div className="flex-1">{/* 빌드 히스토리 내용 */}</div>
+          <Board title="학생 명단">
+            <StudentList students={students} />
           </Board>
         </div>
-
-        {/* 오른쪽: 학생 명단 */}
-        <Board title="학생 명단">
-          <StudentList students={students} />
-        </Board>
       </div>
     </div>
   );
