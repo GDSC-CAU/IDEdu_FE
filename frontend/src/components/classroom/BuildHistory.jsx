@@ -1,7 +1,12 @@
 export default function BuildHistory({ buildHistories }) {
+  // 최신순 정렬
+  const sortedHistories = [...buildHistories].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
   return (
     <div className="flex flex-col gap-3 p-2">
-      {buildHistories.map((buildHistory, index) => (
+      {sortedHistories.map((buildHistory, index) => (
         <BuildHistoryCard
           key={index}
           member={buildHistory.member}
